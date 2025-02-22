@@ -36,13 +36,14 @@ module Langchain::Vectorsearch
     def add_texts(texts:, ids: [], metadatas: [])
       embeddings = Array(texts).map.with_index do |text, i|
         id = ids[i] ? ids[i].to_s : SecureRandom.uuid
+        llm_response = llm.embed(text: text)
         ::Chroma::Resources::Embedding.new(
           id: id,
-          embedding: llm.embed(text: text).embedding,
+          embedding: llm_response.embedding,
           metadata: metadatas[i] || {},
           document: text # Do we actually need to store the whole original document?
         )
-        Langchain.logger.debug("#{self.class} - Embedding #{id}")
+        Langchain.logger.debug("#{self.class} - Embedding #{id} - #{llm_response.prompt_tokens} tokens")
 
       end
 
