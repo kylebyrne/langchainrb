@@ -17,7 +17,9 @@ module Langchain::LLM
       chat_model: "command-r-plus",
       embedding_model: "small",
       dimensions: 1024,
-      truncate: "START"
+      truncate: "START",
+      embedding_input_type: "classification",
+      embedding_types: ["float"]
     }.freeze
 
     def initialize(api_key:, default_options: {})
@@ -48,10 +50,15 @@ module Langchain::LLM
     def embed(text:)
       response = client.embed(
         texts: [text],
-        model: @defaults[:embedding_model]
+        model: @defaults[:embedding_model],
+        input_type: @defaults[:embedding_input_type],
+        embedding_types: @defaults[:embedding_types]
       )
 
-      Langchain::LLM::CohereResponse.new response, model: @defaults[:embedding_model]
+      Langchain::LLM::CohereResponse.new(
+        response,
+        model: @defaults[:embedding_model]
+      )
     end
 
     #
